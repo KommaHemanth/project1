@@ -1,19 +1,19 @@
 # generate the public-private key
-resource "tls_private_key" "pk-generate" {
+resource "tls_private_key" "insignia-NVirginia" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 # create aws key-pair
-resource "aws_key_pair" "server-key" {
-  key_name   = "serverkey"
-  public_key = tls_private_key.pk-generate.public_key_openssh
+resource "aws_key_pair" "insignia-NVirginia" {
+  key_name   = "insignia-NVirginia"
+  public_key = tls_private_key.insignia-NVirginia.public_key_openssh
 }
 
 # store the generated private key in local disk
 resource "local_file" "privateKey_pem" {
-  filename = "serverkey.pem"
-  content  = tls_private_key.pk-generate.private_key_pem
+  filename = "insignia-NVirginia.pem"
+  content  = tls_private_key.insignia-NVirginia.private_key_pem
 }
 
 
@@ -23,7 +23,7 @@ resource "aws_instance" "jenkins" {
   ami                    = var.AMIS["UBUNTU22"]
   instance_type          = "t2.small"
   availability_zone      = var.ZONE["ZONE1"]
-  key_name               = aws_key_pair.server-key.key_name
+  key_name               = aws_key_pair.insignia-NVirginia.key_name
   vpc_security_group_ids = [aws_security_group.jenkins-sg.id]
   tags = {
     Name    = "Jenkins-Server"
@@ -47,7 +47,7 @@ resource "aws_instance" "jenkins" {
   # connect to the ssh through ssh
   connection {
     user        = var.USER["UBUNTU"]
-    private_key = tls_private_key.pk-generate.private_key_pem
+    private_key = tls_private_key.insignia-NVirginia.private_key_pem
     host        = self.public_ip
   }
 }
@@ -59,7 +59,7 @@ resource "aws_instance" "sonarqube" {
   ami                    = var.AMIS["UBUNTU22"]
   instance_type          = "t2.medium"
   availability_zone      = var.ZONE["ZONE1"]
-  key_name               = aws_key_pair.server-key.key_name
+  key_name               = aws_key_pair.insignia-NVirginia.key_name
   vpc_security_group_ids = [aws_security_group.sonarqube-sg.id]
   tags = {
     Name    = "Sonarqube-Server"
@@ -83,7 +83,7 @@ resource "aws_instance" "sonarqube" {
   # connect to the ssh through ssh
   connection {
     user        = var.USER["UBUNTU"]
-    private_key = tls_private_key.pk-generate.private_key_pem
+    private_key = tls_private_key.insignia-NVirginia.private_key_pem
     host        = self.public_ip
   }
 }
@@ -95,11 +95,10 @@ resource "aws_instance" "nexus" {
   ami                    = var.AMIS["CENTOS7"]
   instance_type          = "t2.medium"
   availability_zone      = var.ZONE["ZONE1"]
-  key_name               = aws_key_pair.server-key.key_name
+  key_name               = aws_key_pair.insignia-NVirginia.key_name
   vpc_security_group_ids = [aws_security_group.nexus-sg.id]
   tags = {
     Name    = "Nexus-Server"
-    Project = "Production"
   }
 
   # copy file into server
@@ -119,7 +118,7 @@ resource "aws_instance" "nexus" {
   # connect to the ssh through ssh
   connection {
     user        = var.USER["CENTOS"]
-    private_key = tls_private_key.pk-generate.private_key_pem
+    private_key = tls_private_key.insignia-NVirginia.private_key_pem
     host        = self.public_ip
   }
 }
