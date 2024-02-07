@@ -21,13 +21,12 @@ resource "local_file" "privateKey_pem" {
 #
 resource "aws_instance" "jenkins" {
   ami                    = var.AMIS["UBUNTU22"]
-  instance_type          = "t2.small"
+  instance_type          = "t2.medium"
   availability_zone      = var.ZONE["ZONE1"]
   key_name               = aws_key_pair.insignia-NVirginia.key_name
   vpc_security_group_ids = [aws_security_group.jenkins-sg.id]
   tags = {
     Name    = "Jenkins-Server"
-    Project = "Production"
   }
 
   # copy file into server
@@ -63,7 +62,6 @@ resource "aws_instance" "sonarqube" {
   vpc_security_group_ids = [aws_security_group.sonarqube-sg.id]
   tags = {
     Name    = "Sonarqube-Server"
-    Project = "Production"
   }
 
   # copy file into server
@@ -92,7 +90,7 @@ resource "aws_instance" "sonarqube" {
 # Nexus Instance
 #
 resource "aws_instance" "nexus" {
-  ami                    = var.AMIS["CENTOS7"]
+  ami                    = var.AMIS["UBUNUTU22"]
   instance_type          = "t2.medium"
   availability_zone      = var.ZONE["ZONE1"]
   key_name               = aws_key_pair.insignia-NVirginia.key_name
@@ -117,7 +115,7 @@ resource "aws_instance" "nexus" {
 
   # connect to the ssh through ssh
   connection {
-    user        = var.USER["CENTOS"]
+    user        = var.USER["UBUNTU"]
     private_key = tls_private_key.insignia-NVirginia.private_key_pem
     host        = self.public_ip
   }
